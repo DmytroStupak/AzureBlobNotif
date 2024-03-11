@@ -1,11 +1,14 @@
 ﻿using Azure.Storage;
+using AzureBlobNotif.Interfaces;
 
 namespace AzureBlobNotif
 {
-    public class SasGener
+    public class UriSasGener : IUriSasGener
     {
-        public static async Task<string> GetBlobSASTOkenByFile(string fileName)
+        public string GetBlobSASTOkenByFile(string fileName)
         {
+            var myBlobUrl = $"{Const.CONTAINER_URL}{fileName}?";
+
             try
             {
                 var azureStorageAccount = Const.STORAGE_ACCOUNT;
@@ -19,7 +22,10 @@ namespace AzureBlobNotif
                 blobSasBuilder.SetPermissions(Azure.Storage.Sas.BlobSasPermissions.Read);
                 var sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(azureStorageAccount,
                     azureStorageAccessKey)).ToString();
-                return sasToken;
+                
+                var sasUri = myBlobUrl + sasToken;
+                
+                return  sasUri;
             }
             catch (Exception)
             {
